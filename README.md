@@ -31,7 +31,7 @@ Our **task** for this project is to
 2) implement an improvement to the current practice. To do this, we used a linear regression model and an xgboost model.
 3) evaluate the performance gain of our proposed improvements against the baselines. 
 
-**To run this script, follow the instructions on the [doc folder] (https://github.com/TZstatsADS/Fall2018-Proj3-Sec1-grp4/tree/master/doc) of this repository. **
+**To run this script, follow the instructions on the [doc folder](https://github.com/TZstatsADS/Fall2018-Proj3-Sec1-grp4/tree/master/doc) of this repository. **
 	
 **Contribution statement**: ([default](doc/a_note_on_contributions.md)) All team members contributed equally in all stages of this project. All team members approve our work presented in this GitHub repository including this contributions statement. 
 
