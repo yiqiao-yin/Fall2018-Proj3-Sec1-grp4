@@ -11,30 +11,26 @@ As inputs, it consists of paths for low-res and high-res images and as an output
 
 2) crossvalidation.R : This script performs a cross validation on the training set of our image data 
 
-3) train.R: 'train.R' and 'test.R' contain the training steps and the classification/predictions steps for our models. As inputs, they take in a path that points toe the training set features and responses. 
-As 
+3) train.R: contains the training steps for the model. As input, it takes in a path that points toe the training set features and responses and as an output, it creates trained classifiers in the form of R objects: models/settings/links to external trained configurations.
+
+4) test.R: contains the steps for classification/prediction. As inputs, it takes in a path that points to the test set features, and an R object that contains a trained classifier.
+As output, it produces an R object of response predictions of the test set. 
+
+5) SuperResolution.R: This script takes in a path that points toe fhe folder of low-resolution test images, a path that pointsto an empty folder of high-resolution test images, an R object with tuned predictors and as an output, it constructs high-resolution versions of each low-resolution test image. 
+
+* The main.rmd (link code here) consists of two parts: 
+
+**Part 1**: Follows the structure and work flow of the baseline model 
+
+**Part2** : Follows the structure and work flow of both our improved models: a linear regression and an xgboost model. 
+
+* The output of our final report, main.rmd will be saved in two directories: 
+
+1) The output folder (link here)
+
+2) The SR-B folder located in the test set folder of the data folder 
 
 
-2) input of rmd file is in the lib folder
-inputs are: 
-feature.R, this script will extract 8 pixels on a selected pixel and use that as the varaible for training
-crossvalidation.R
-train.R
-test.R
-superresolution.R
-
-3) this main.rmd has part 1 and part 2
-part 1 will follow structure of baseline model
-
-part 2 will follow structure of improved model
-
-linear regression
-xgboost
-
-4) The output of main.rmd file is saved in two directories: 
-output folder
-
-data folder --> test set --> SR-B folder
 
 
 
