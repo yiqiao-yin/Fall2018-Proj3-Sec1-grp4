@@ -13,7 +13,9 @@ Term: Fall 2018
 	+ Anke Xu
 	+ Yiqiao Yin
 
-+ Project summary: In this project, we created a classification engine to enhance the resolution of images. 
++ Project summary: In this project, we created a classification engine to enhance the resolution of images. To do so, we will carry out model evaluation and selection for predictive analytics on image data. 
+
+We started out with a set of [1500 pairs of images](https://www.dropbox.com/s/7agsll3t5t7spkr/train_set.zip?dl=0). 
 	
 **Contribution statement**: ([default](doc/a_note_on_contributions.md)) All team members contributed equally in all stages of this project. All team members approve our work presented in this GitHub repository including this contributions statement. 
 
