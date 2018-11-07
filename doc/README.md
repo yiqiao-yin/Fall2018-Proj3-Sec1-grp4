@@ -22,7 +22,7 @@ As output, it produces an R object of response predictions of the test set.
 
 **Part 1**: Follows the structure and work flow of the baseline model 
 
-**Part2** : Follows the structure and work flow of both our improved models: a linear regression and an xgboost model. 
+**Part 2** : Follows the structure and work flow of both our improved models: a linear regression and an xgboost model. 
 
 * The output of our final report, main.rmd will be saved in two directories: 
 
