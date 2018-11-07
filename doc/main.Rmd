@@ -144,7 +144,7 @@ if(run.cv){
   load("../output/err_cv.RData")
   plot(model_values, err_cv[,1], xlab="Interaction Depth", ylab="CV Error",
        main="Cross Validation Error", type="n", 
-       ylim=c(min(err_cv[,1])-max(sd(err_cv[,2]))-0.0005, max(err_cv[,1])+max(sd(err_cv[,2]))+0.0005))
+       ylim=c(min(err_cv[,1])-max(sd(err_cv[,2]))-0.001, max(err_cv[,1])+max(sd(err_cv[,2]))+0.001))
   points(model_values, err_cv[,1], col="blue", pch=16)
   lines(model_values, err_cv[,1], col="blue")
   arrows(model_values, err_cv[,1]-err_cv[,2], model_values, err_cv[,1]+err_cv[,2], 
@@ -185,6 +185,7 @@ Feed the final training model with the completely holdout testing data.
 ```{r superresolution}
 begin <- Sys.time()
 source(paste0(path, "/lib/superResolution.R"))
+source(paste0(path, "/lib/test.R"))
 test_dir <- paste0(path, "/data/test_set/") # This will be modified for different data sets.
 test_LR_dir <- paste(test_dir, "LR/", sep="")
 test_HR_dir <- paste(test_dir, "SR-B/", sep="")
@@ -202,21 +203,34 @@ end - begin
 
 Prediction performance matters, so does the running times for constructing features and for training the model, especially when the computation resource is limited. 
 ```{r running_time}
-cat("Time for constructing training features=", tm_feature_train[1], "s \n")
+#cat("Time for constructing training features=", tm_feature_train[1], "s \n")
 #cat("Time for constructing testing features=", tm_feature_test[1], "s \n")
-cat("Time for training model=", tm_train[1], "s \n")
+#cat("Time for training model=", tm_train[1], "s \n")
 cat("Time for super-resolution=", tm_test[1], "s \n")
 ```
 
-# PART II - IMPROVED MODEL
+
+
+
+
+
+
+
+
+
+
+
+
+
+# PART II - IMPROVED MODEL - Xgboost
 
 ### Step 0: specify directories.
 
 Set the working directory to the image folder. Specify the training and the testing set. For data without an independent test/validation set, you need to create your own testing data by random subsampling. In order to obain reproducible results, set.seed() whenever randomization is used. 
 
-```{r wkdir improved, eval=FALSE}
+```{r wkdir improved xgb, eval=FALSE}
 set.seed(2018)
-path <- "C:/Users/eagle/Desktop/Fall2018-Proj3-Sec1-grp4-master"
+path <- "/Users/amon/Documents/GitHub/Fall2018-Proj3-Sec1-grp4"
 setwd(path)
 ```
 
@@ -238,7 +252,7 @@ In this chunk, we have a set of controls for the evaluation experiments.
 + (T/F) run evaluation on an independent test set
 + (T/F) process features for test set
 
-```{r exp_setup improved}
+```{r exp_setup improved xgb}
 run.cv=TRUE # run cross-validation on the training set
 K <- 5  # number of CV folds
 run.feature.train=TRUE # process features for training set
@@ -248,8 +262,8 @@ run.feature.test=TRUE # process features for test set
 
 Using cross-validation or independent test set evaluation, we compare the performance of models with different specifications. In this example, we use GBM with different `depth`. In the following chunk, we list, in a vector, setups (in this case, `depth`) corresponding to models that we will compare. In your project, you might compare very different classifiers. You can assign them numerical IDs and labels specific to your project. 
 
-```{r model_setup improved}
-model_values <- seq(3, 11, 2)
+```{r model_setup improved xgb}
+model_values <- c(250,300,350) ### Tuning values
 model_labels = paste("GBM with depth =", model_values)
 ```
 
@@ -257,7 +271,7 @@ model_labels = paste("GBM with depth =", model_values)
 
 We provide extra information of image label: car (0), flower (1), market (2). These labels are not necessary for your model.
 
-```{r train_label improved}
+```{r train_label improved xgb}
 extra_label <- read.csv(train_label_path, colClasses=c("NULL", NA, NA))
 ```
 
@@ -269,7 +283,7 @@ extra_label <- read.csv(train_label_path, colClasses=c("NULL", NA, NA))
   + Input: a path for high-resolution images.
   + Output: an RData file that contains extracted features and corresponding responses
 
-```{r feature improved}
+```{r feature improved xgb}
 source(paste0(path, "/lib/feature.R"))
 
 tm_feature_train <- NA
@@ -282,7 +296,7 @@ if(run.feature.train){
 cat("Time for constructing training features=", tm_feature_train[1], "s \n")
 save(dat_train, file=paste0(
   path,
-  "/output/feature_train.RData"
+  "/output/feature_train_xgb.RData"
 ))
 ```
 
@@ -299,16 +313,16 @@ Call the train model and test model from library.
   + Input: a path that points to the test set features.
   + Input: an R object that contains a trained classifier.
   + Output: an R object of response predictions on the test set. If there are multiple classifiers under evaluation, there should be multiple sets of label predictions. 
-```{r loadlib improved}
-source(paste0(path, "/lib/train_improved.R"))
-source(paste0(path, "/lib/test_improved.R"))
+```{r loadlib improved xgb}
+source(paste0(path, "/lib/train_improved_xgb.R"))
+source(paste0(path, "/lib/test_improved_xgb.R"))
 ```
 
 #### Model selection with cross-validation
 
 * Do model selection by choosing among different values of training model parameters, that is, the interaction depth for GBM in this example. 
-```{r runcv improved, message=FALSE, warning=FALSE}
-source(paste0(path, "/lib/cross_validation_improved.R"))
+```{r runcv improved xgb, message=FALSE, warning=FALSE}
+source(paste0(path, "/lib/cross_validation_improved_xgb.R"))
 
 #temp.1 = feat_train
 #temp.2 = label_train
@@ -316,51 +330,52 @@ source(paste0(path, "/lib/cross_validation_improved.R"))
 #feat_train = temp.1
 #label_train = temp.2
 
+
 if(run.cv){
-  err_cv <- array(dim=c(length(model_values), 2))
+  err_cv_xgb <- array(dim=c(length(model_values), 2))
   for(k in 1:length(model_values)){
     cat("k=", k, "\n")
-    err_cv[k,] <- cv.function(feat_train, label_train, K)
+    err_cv_xgb[k,] <- cv.function(feat_train, label_train, model_values[k],K)
   }
-  save(err_cv, file=paste0(path, "/output/err_cv_improved.RData"))
+  save(err_cv_xgb, file=paste0(path, "/output/err_cv_xgb.RData"))
 }
 ```
 
 #### Visualize cross-validation results. 
 
-```{r cv_vis improved}
+```{r cv_vis improved xgb}
 if(run.cv){
-  load("../output/err_cv_improved.RData")
-  plot(model_values, err_cv[,1], xlab="Interaction Depth", ylab="CV Error",
+  load("../output/err_cv_xgb.RData")
+  plot(model_values, err_cv_xgb[,1], xlab="Interaction Depth", ylab="CV Error",
        main="Cross Validation Error", type="n", 
-       ylim=c(min(err_cv[,1])-max(sd(err_cv[,2]))-0.0005, max(err_cv[,1])+max(sd(err_cv[,2]))+0.0005)
+       ylim=c(min(err_cv_xgb[,1])-max(sd(err_cv_xgb[,2]))-0.03, max(err_cv_xgb[,1])+max(sd(err_cv_xgb[,2]))+0.03)
        )
-  points(model_values, err_cv[,1], col="blue", pch=16)
-  lines(model_values, err_cv[,1], col="blue")
-  arrows(model_values, err_cv[,1]-err_cv[,2], model_values, err_cv[,1]+err_cv[,2], 
+  points(model_values, err_cv_xgb[,1], col="blue", pch=16)
+  lines(model_values, err_cv_xgb[,1], col="blue")
+  arrows(model_values, err_cv_xgb[,1]-err_cv_xgb[,2], model_values, err_cv_xgb[,1]+err_cv_xgb[,2], 
         length=0.1, angle=90, code=3)
 }
 
 # Average cv error and cv SD
-apply(err_cv, 2, mean)
+apply(err_cv_xgb, 2, mean)
 ```
 
 
 * Choose the "best"" parameter value
-```{r best_model improved}
+```{r best_model improved xgb}
 model_best=model_values[1]
 if(run.cv){
-  model_best <- model_values[which.min(err_cv[,1])]
+  model_best <- model_values[which.min(err_cv_xgb[,1])]
 }
 
-par_best <- list(depth=model_best)
+par_best <- list(nr=model_best)
 ```
 
 * Train the model with the entire training set using the selected model (model parameter) via cross-validation.
-```{r final_train improved}
+```{r final_train improved xgb}
 tm_train=NA
-tm_train <- system.time(fit_train <- train(feat_train, label_train))
-save(fit_train, file="../output/fit_train_improved.RData")
+tm_train <- system.time(fit_train <- train(feat_train, label_train,par_best))
+save(fit_train, file="../output/fit_train_xgb.RData")
 ```
 
 ### Step 5: Super-resolution for test images
@@ -372,7 +387,7 @@ Feed the final training model with the completely holdout testing data.
   + Input: an R object that contains tuned predictors.
   + Output: construct high-resolution versions for each low-resolution test image.
   
-```{r superresolution improved}
+```{r superresolution improved xgb}
 source(paste0(path, "/lib/superResolution.R"))
 test_dir <- paste0(path, "/data/test_set/") # This will be modified for different data sets.
 test_LR_dir <- paste(test_dir, "LR/", sep="")
@@ -380,7 +395,7 @@ test_HR_dir <- paste(test_dir, "SR-I/", sep="")
 
 tm_test=NA
 if(run.test){
-  load(file="../output/fit_train_improved.RData")
+  load(file="../output/fit_train_xgb.RData")
   tm_test <- system.time(superResolution(test_LR_dir, test_HR_dir, fit_train))
 }
 ```
@@ -388,9 +403,8 @@ if(run.test){
 ### Summarize Running Time
 
 Prediction performance matters, so does the running times for constructing features and for training the model, especially when the computation resource is limited. 
-```{r running_time improved}
+```{r running_time improved xgb}
 cat("Time for constructing training features=", tm_feature_train[1], "s \n")
 #cat("Time for constructing testing features=", tm_feature_test[1], "s \n")
 cat("Time for training model=", tm_train[1], "s \n")
 cat("Time for super-resolution=", tm_test[1], "s \n")
-```
