@@ -24,7 +24,7 @@ superResolution <- function(LR_dir, HR_dir, modelList){
   ### read LR/HR image pairs
   for (i in 1:n_files){
     imgLR <- readImage(paste0(LR_dir,  "img", "_", sprintf("%04d", i), ".jpg")); imgLR_backup <- imgLR
-    L = 20 # Try resize to a smaller size to check whether this script is correct
+    L = 50 # Try resize to a smaller size to check whether this script is correct
     imgLR_small <- resize(imgLR, L, L); imgLR <- imgLR_small
     pathHR <- paste0(HR_dir,  "img", "_", sprintf("%04d", i), "-draft", ".jpg")
     featMat <- array(NA, c(dim(imgLR)[1] * dim(imgLR)[2], 8, 3)); dim(featMat)
@@ -72,7 +72,7 @@ superResolution <- function(LR_dir, HR_dir, modelList){
     featMat[(begin.row+1):((length(rep(2:(L-1),length(2:(L-1)))))),,] <- fill.up.feat.unit
     
     ### step 2. apply the modelList over featMat
-    predMat <- test(modelList, featMat)
+    predMat <- train(modelList, featMat)
     predMat <- array(predMat, c(dim(imgLR)[1]*2 * dim(imgLR)[2]*2, 4, 3)); dim(predMat)
     
     ### step 3. recover high-resolution from predMat and save in HR_dir

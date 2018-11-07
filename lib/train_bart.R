@@ -9,8 +9,7 @@
 #label_train <- train.label
 #par = par
 
-train <- function(dat_train, label_train, par=NULL,
-                  n.trees = 200, bag.fraction = 0.5, inter.depth = 10){
+train <- function(dat_train, label_train, par=NULL){
   
   ### Train a Gradient Boosting Model (GBM) using processed features from training images
   
@@ -20,7 +19,7 @@ train <- function(dat_train, label_train, par=NULL,
   ### Output: a list for trained models
   
   ### load libraries
-  library("gbm")
+  library("BayesTree")
   
   ### creat model list
   modelList <- list()
@@ -40,15 +39,14 @@ train <- function(dat_train, label_train, par=NULL,
     c2 <- (i-c1) %/% 4 + 1
     featMat <- dat_train[, , c2]
     labMat <- label_train[, c1, c2]
-    fit_gbm <- gbm.fit(x=featMat, y=labMat,
-                       n.trees=n.trees,
-                       distribution="gaussian",
-                       interaction.depth=inter.depth, 
-                       bag.fraction = bag.fraction,
-                       verbose=FALSE)
+    fit_gbm <- bart(
+      x.train = featMat,
+      y.train = labMat,
+      #x.test  = test.x,
+      verbose = FALSE,
+      ntree = 300)
     best_iter <- gbm.perf(fit_gbm, method="OOB", plot.it = FALSE)
     modelList[[i]] <- list(fit=fit_gbm, iter=best_iter[1])
   }
-  
   return(modelList)
 }
