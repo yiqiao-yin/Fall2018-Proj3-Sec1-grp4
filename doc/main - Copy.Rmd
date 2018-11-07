@@ -35,7 +35,7 @@ setwd(path)
 ```
 
 Provide directories for training images. Low-resolution (LR) image set and High-resolution (HR) image set will be in different subfolders. 
-```{r, warning=FALSE}
+```{r}
 train_dir <- paste0(path, "/data/train_set/") # This will be modified for different data sets.
 train_LR_dir <- paste(train_dir, "LR/", sep="")
 train_HR_dir <- paste(train_dir, "HR/", sep="")
@@ -121,18 +121,16 @@ source(paste0(path, "/lib/test.R"))
 #### Model selection with cross-validation
 
 * Do model selection by choosing among different values of training model parameters, that is, the interaction depth for GBM in this example. 
-```{r runcv, message=FALSE, warning=FALSE, echo=FALSE, results='hide'}
+```{r runcv, message=FALSE, warning=FALSE, echo=TRUE, results="hide"}
 source(paste0(path, "/lib/cross_validation.R"))
 
 if(run.cv){
   err_cv <- array(dim=c(length(model_values), 2))
   for(k in 1:length(model_values)){
     cat("k=", k, "\n")
-    err_cv[k,] <- cv.function(
-      feat_train, 
-      label_train, 
-      model_values[k], K #n.trees = 200, bag.fraction = 0.5, inter.depth = 3
-      )}
+    err_cv[k,] <- cv.function(feat_train, label_train, model_values[k], K,
+                              n.trees = 300, bag.fraction = 0.5, inter.depth = 3)
+  }
   save(err_cv, file=paste0(path, "/output/err_cv.RData"))
 }
 ```
@@ -144,7 +142,7 @@ if(run.cv){
   load("../output/err_cv.RData")
   plot(model_values, err_cv[,1], xlab="Interaction Depth", ylab="CV Error",
        main="Cross Validation Error", type="n", 
-       ylim=c(min(err_cv[,1])-max(sd(err_cv[,2]))-0.0005, max(err_cv[,1])+max(sd(err_cv[,2]))+0.0005))
+       ylim=c(min(err_cv[,1])-max(sd(err_cv[,2]))-0.003, max(err_cv[,1])+max(sd(err_cv[,2]))+0.003))
   points(model_values, err_cv[,1], col="blue", pch=16)
   lines(model_values, err_cv[,1], col="blue")
   arrows(model_values, err_cv[,1]-err_cv[,2], model_values, err_cv[,1]+err_cv[,2], 
@@ -183,7 +181,6 @@ Feed the final training model with the completely holdout testing data.
   + Output: construct high-resolution versions for each low-resolution test image.
   
 ```{r superresolution}
-begin <- Sys.time()
 source(paste0(path, "/lib/superResolution.R"))
 test_dir <- paste0(path, "/data/test_set/") # This will be modified for different data sets.
 test_LR_dir <- paste(test_dir, "LR/", sep="")
@@ -194,8 +191,6 @@ if(run.test){
   load(file="../output/fit_train.RData")
   tm_test <- system.time(superResolution(test_LR_dir, test_HR_dir, fit_train))
 }
-end <- Sys.time()
-end - begin
 ```
 
 ### Summarize Running Time
@@ -207,7 +202,6 @@ cat("Time for constructing training features=", tm_feature_train[1], "s \n")
 cat("Time for training model=", tm_train[1], "s \n")
 cat("Time for super-resolution=", tm_test[1], "s \n")
 ```
-
 # PART II - IMPROVED MODEL
 
 ### Step 0: specify directories.
@@ -265,9 +259,9 @@ extra_label <- read.csv(train_label_path, colClasses=c("NULL", NA, NA))
 
 `feature.R` should be the wrapper for all your feature engineering functions and options. The function `feature( )` should have options that correspond to different scenarios for your project and produces an R object that contains features and responses that are required by all the models you are going to evaluate later. 
 + `feature.R`
-  + Input: a path for low-resolution images.
-  + Input: a path for high-resolution images.
-  + Output: an RData file that contains extracted features and corresponding responses
++ Input: a path for low-resolution images.
++ Input: a path for high-resolution images.
++ Output: an RData file that contains extracted features and corresponding responses
 
 ```{r feature improved}
 source(paste0(path, "/lib/feature.R"))
@@ -293,21 +287,21 @@ Call the train model and test model from library.
 
 `train.R` and `test.R` should be wrappers for all your model training steps and your classification/prediction steps. 
 + `train.R`
-  + Input: a path that points to the training set features and responses.
-  + Output: an RData file that contains trained classifiers in the forms of R objects: models/settings/links to external trained configurations.
++ Input: a path that points to the training set features and responses.
++ Output: an RData file that contains trained classifiers in the forms of R objects: models/settings/links to external trained configurations.
 + `test.R`
-  + Input: a path that points to the test set features.
-  + Input: an R object that contains a trained classifier.
-  + Output: an R object of response predictions on the test set. If there are multiple classifiers under evaluation, there should be multiple sets of label predictions. 
++ Input: a path that points to the test set features.
++ Input: an R object that contains a trained classifier.
++ Output: an R object of response predictions on the test set. If there are multiple classifiers under evaluation, there should be multiple sets of label predictions. 
 ```{r loadlib improved}
 source(paste0(path, "/lib/train_improved.R"))
-source(paste0(path, "/lib/test_improved.R"))
+#source(paste0(path, "/lib/test_improved.R"))
 ```
 
 #### Model selection with cross-validation
 
 * Do model selection by choosing among different values of training model parameters, that is, the interaction depth for GBM in this example. 
-```{r runcv improved, message=FALSE, warning=FALSE}
+```{r runcv improved, message=FALSE, warning=FALSE, echo=TRUE, results="hide"}
 source(paste0(path, "/lib/cross_validation_improved.R"))
 
 #temp.1 = feat_train
@@ -320,7 +314,7 @@ if(run.cv){
   err_cv <- array(dim=c(length(model_values), 2))
   for(k in 1:length(model_values)){
     cat("k=", k, "\n")
-    err_cv[k,] <- cv.function(feat_train, label_train, K)
+    err_cv[k,] <- cv.function(feat_train, label_train, K)$result
   }
   save(err_cv, file=paste0(path, "/output/err_cv_improved.RData"))
 }
@@ -330,15 +324,16 @@ if(run.cv){
 
 ```{r cv_vis improved}
 if(run.cv){
-  load("../output/err_cv_improved.RData")
+  #load("../output/err_cv_improved.RData")
+  load(paste0(path, "/output/err_cv_improved.RData"))
   plot(model_values, err_cv[,1], xlab="Interaction Depth", ylab="CV Error",
        main="Cross Validation Error", type="n", 
-       ylim=c(min(err_cv[,1])-max(sd(err_cv[,2]))-0.0005, max(err_cv[,1])+max(sd(err_cv[,2]))+0.0005)
-       )
+       ylim=c(min(err_cv[,1])-max(sd(err_cv[,2]))-0.001, max(err_cv[,1])+max(sd(err_cv[,2]))+0.001)
+  )
   points(model_values, err_cv[,1], col="blue", pch=16)
   lines(model_values, err_cv[,1], col="blue")
   arrows(model_values, err_cv[,1]-err_cv[,2], model_values, err_cv[,1]+err_cv[,2], 
-        length=0.1, angle=90, code=3)
+         length=0.1, angle=90, code=3)
 }
 
 # Average cv error and cv SD
@@ -348,40 +343,40 @@ apply(err_cv, 2, mean)
 
 * Choose the "best"" parameter value
 ```{r best_model improved}
-model_best=model_values[1]
-if(run.cv){
-  model_best <- model_values[which.min(err_cv[,1])]
-}
+#model_best=model_values[1]
+#if(run.cv){
+#model_best <- model_values[which.min(err_cv[,1])]
+#}
 
-par_best <- list(depth=model_best)
+#par_best <- model_best
 ```
 
 * Train the model with the entire training set using the selected model (model parameter) via cross-validation.
 ```{r final_train improved}
-tm_train=NA
-tm_train <- system.time(fit_train <- train(feat_train, label_train))
-save(fit_train, file="../output/fit_train_improved.RData")
+#tm_train=NA
+#tm_train <- system.time(fit_train <- train(feat_train, label_train, par_best))
+#save(fit_train, file="../output/fit_train_improved.RData")
 ```
 
 ### Step 5: Super-resolution for test images
 
 Feed the final training model with the completely holdout testing data. 
 + `superResolution.R`
-  + Input: a path that points to the folder of low-resolution test images.
-  + Input: a path that points to the folder (empty) of high-resolution test images.
-  + Input: an R object that contains tuned predictors.
-  + Output: construct high-resolution versions for each low-resolution test image.
-  
++ Input: a path that points to the folder of low-resolution test images.
++ Input: a path that points to the folder (empty) of high-resolution test images.
++ Input: an R object that contains tuned predictors.
++ Output: construct high-resolution versions for each low-resolution test image.
+
 ```{r superresolution improved}
-source(paste0(path, "/lib/superResolution.R"))
+source(paste0(path, "/lib/superResolution_improved.R"))
 test_dir <- paste0(path, "/data/test_set/") # This will be modified for different data sets.
 test_LR_dir <- paste(test_dir, "LR/", sep="")
 test_HR_dir <- paste(test_dir, "SR-I/", sep="")
 
 tm_test=NA
 if(run.test){
-  load(file="../output/fit_train_improved.RData")
-  tm_test <- system.time(superResolution(test_LR_dir, test_HR_dir, fit_train))
+#load(file="../output/fit_train_improved.RData")
+tm_test <- system.time(superResolution(test_LR_dir, test_HR_dir, fit_train))
 }
 ```
 

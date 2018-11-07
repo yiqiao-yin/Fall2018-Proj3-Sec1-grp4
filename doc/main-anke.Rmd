@@ -35,7 +35,7 @@ setwd(path)
 ```
 
 Provide directories for training images. Low-resolution (LR) image set and High-resolution (HR) image set will be in different subfolders. 
-```{r, warning=FALSE}
+```{r}
 train_dir <- paste0(path, "/data/train_set/") # This will be modified for different data sets.
 train_LR_dir <- paste(train_dir, "LR/", sep="")
 train_HR_dir <- paste(train_dir, "HR/", sep="")
@@ -121,7 +121,7 @@ source(paste0(path, "/lib/test.R"))
 #### Model selection with cross-validation
 
 * Do model selection by choosing among different values of training model parameters, that is, the interaction depth for GBM in this example. 
-```{r runcv, message=FALSE, warning=FALSE, echo=FALSE, results='hide'}
+```{r runcv, message=FALSE, warning=FALSE}
 source(paste0(path, "/lib/cross_validation.R"))
 
 if(run.cv){
@@ -171,6 +171,8 @@ par_best <- list(depth=model_best)
 tm_train=NA
 tm_train <- system.time(fit_train <- train(feat_train, label_train, par_best))
 save(fit_train, file="../output/fit_train.RData")
+summary(fit_train[[1]]$fit)
+
 ```
 
 ### Step 5: Super-resolution for test images
@@ -183,7 +185,6 @@ Feed the final training model with the completely holdout testing data.
   + Output: construct high-resolution versions for each low-resolution test image.
   
 ```{r superresolution}
-begin <- Sys.time()
 source(paste0(path, "/lib/superResolution.R"))
 test_dir <- paste0(path, "/data/test_set/") # This will be modified for different data sets.
 test_LR_dir <- paste(test_dir, "LR/", sep="")
@@ -194,8 +195,6 @@ if(run.test){
   load(file="../output/fit_train.RData")
   tm_test <- system.time(superResolution(test_LR_dir, test_HR_dir, fit_train))
 }
-end <- Sys.time()
-end - begin
 ```
 
 ### Summarize Running Time
