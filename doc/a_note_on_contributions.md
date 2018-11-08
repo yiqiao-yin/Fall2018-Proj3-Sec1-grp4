@@ -11,10 +11,24 @@ Below is an example. If no contribution statement is provided, we will insert a 
 ---
 Sample project README statement.
 
-Project xxx
+Project 3
 
-Team members: Avi Bond, Comma Deed, En Funn, Gem Hon
+Team members: Yiqiao Yin, Anke Xu, Chuqiao Rong, Amon Tokoro, Yadir Lakehal
 
-Summary: In this project, we developed a new method and improved the classification accuracy for images of cats and dogs to 99.9%
+Summary: In this project, we improved low resolution through machine learning and we generate high resolution images.
 
-[Contribution Statement] AB, CD, EF and GH designed the study. AB and CD developed baseline classification model for evaluation. EF and GH explored feature engineering for improving the baseline model. AB, EF and GH discussed and designed the model evaluation protocol. CD carried out the computation for model evaluation. All team members contributed to the GitHub repository and prepared the presentation. All team members approve our work presented in our GitHub repository including this contribution statement.
+[Contribution Statement] 
+
+Project leader:
+
+Yiqiao Yin：Designed and organized the structure of whole project. Built the baseline model and the linear regression model. Helped debugging through the whole project. Also prepared the presentation slide.
+
+Major contributor:
+
+Anke Xu : Build and optimized xgboost model and linear regression model. Tuning parameters for the xgboost model and baseline model. Also helped to make the presentation slide.
+
+Chuqiao Rong: Code feature.R and superResolution.R files. Tuning parameters for the baseline model. Make the presentation slide and presented the project.
+
+Amon Tokoro: Helped debugging for the whole project. Tuning parameters for the baseline model. Trained the improved model.
+
+Yadir Lakehal: Edit the readme file and helped the presenter with the presentation. Helped to make the presentation slide. Tuning parameters for the baseline model.
