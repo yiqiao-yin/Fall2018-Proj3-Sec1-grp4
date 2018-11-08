@@ -36,6 +36,7 @@ Our **task** for this project is to
 **Contribution statement**: 
 
 Project leader:
+
 Yiqiao Yin：Designed and organized the structure of whole project. Built the baseline model and the linear regression model.  Helped debugging through the whole project. Also prepared the presentation slide.
 
 Major contributor:
