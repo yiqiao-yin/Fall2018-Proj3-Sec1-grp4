@@ -25,26 +25,8 @@ Our **task** for this project is to
 3) evaluate the performance gain of our proposed improvements against the baselines. 
 
 **To run this script, follow the instructions on the [doc folder](https://github.com/TZstatsADS/Fall2018-Proj3-Sec1-grp4/tree/master/doc) of this repository. **
-	
-**Contribution statement**: 
 
-Project leader:
-
-Yiqiao Yin：Designed and organized the structure of whole project. Built the baseline model and the linear regression model.  Helped debugging through the whole project. Also prepared the presentation slide.
-
-Major contributor:
-
-Anke Xu : Build and optimized xgboost model and linear regression model. Tuning parameters for the xgboost model and baseline model. Also helped to make the presentation slide.
-
-Chuqiao Rong: Code feature.R and superResolution.R files. Tuning parameters for the baseline model. Make the presentation slide and presented the project.
-
-Amon Tokoro: Helped debugging for the whole project. Tuning parameters for the baseline model. Trained the improved model.
-
-
-Yadir Lakehal: Edit the readme file and helped the presenter with the presentation. Helped to make the presentation slide. Tuning parameters for the baseline model. 
-
-
-We also want to thank Professor Ying Liu and Professor Tian Zheng for hosting lectures of Advanced Data Science this semester. It is with transcending gratitude that we announce here what an inspiration both professors have been throughout our experience of building this shiny app. Their knowledge, understanding and genuine “care” for others is illuminated in everything they do! We, Group 4, are in forever debt for their teachings. Moreoever, we also want to thank to TA, Chengliang Tang. There is not enough we can say about how much we thank heaven that he is our teaching assistance. His patience and understanding are unsurpassed. We are grateful for being his students.
+We want to thank Professor Ying Liu and Professor Tian Zheng for hosting lectures of Advanced Data Science this semester. It is with transcending gratitude that we announce here what an inspiration both professors have been throughout our experience of building this shiny app. Their knowledge, understanding and genuine “care” for others is illuminated in everything they do! We, Group 4, are in forever debt for their teachings. Moreoever, we also want to thank to TA, Chengliang Tang. There is not enough we can say about how much we thank heaven that he is our teaching assistance. His patience and understanding are unsurpassed. We are grateful for being his students.
 
 Following [suggestions](http://nicercode.github.io/blog/2013-04-05-projects/) by [RICH FITZJOHN](http://nicercode.github.io/about/#Team) (@richfitz). This folder is orgarnized as follows.
 
