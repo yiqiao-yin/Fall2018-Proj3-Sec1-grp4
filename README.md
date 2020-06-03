@@ -1,16 +1,9 @@
-# Project 3 : Can you unscramble a blurry image? 
+# Project: Can you unscramble a blurry image? 
 ![image](figs/example.png)
 
 ### [Full Project Description](doc/project3_desc.md)
 
-Term: Fall 2018
-
-+ Team # 4 
-+ Team members
-	+ Yadir Lakehal (yl3435@columbia.edu)
-	+ Chuqiao Rong (cr2945@columbia.edu)
-	+ Amon Tokoro (at3250@columbia.edu)
-	+ Anke Xu (ax2127@columbia.edu)
++ Author
 	+ Yiqiao Yin (yy2502@columbia.edu)
 
 ## Project Summary  
